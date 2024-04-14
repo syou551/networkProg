@@ -3,4 +3,4 @@
 作成したCソースファイルを主に保存する
 
 # 内容
-* client.c - TCPソケット等を用いたクライアントsource(kit.ca.jp proxy使用前提)
+* client.c - TCPソケット等を用いたクライアントsource(kit.ac.jp proxy使用前提)
