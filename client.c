@@ -53,14 +53,14 @@ int main()
     int ret = snprintf(s_buf, BUFSIZE, "%s\r\n",k_buf); /* HTTPの改行コードは \r\n */
 
     /* 文字列をサーバに送信する */
-    if( send(tcpsock, s_buf, strsize, 0) == -1 ){
+    if( send(tcpsock, s_buf, strsize+1, 0) == -1 ){
       fprintf(stderr,"send()");
       exit(EXIT_FAILURE);
     }
    fgets(k_buf,BUFSIZE,stdin);
   }
   send(tcpsock, "\r\n", 2, 0); /* HTTPのメソッド（コマンド）の終わりは空行 */
-
+  printf("send commands\n");
   /* サーバから文字列を受信する */
   if((strsize= recv(tcpsock, r_buf, BUFSIZE-1, 0) ) == -1){
     fprintf(stderr,"recv()");
