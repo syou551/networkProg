@@ -1,3 +1,14 @@
+///result of Running
+///1. >./client https://www.cis.kit.ac.jp
+///   Server: Apache
+///   Content-Length: 210
+///2. >./client http://www.google.com
+///   Server: gws
+///   Content-Length isn't included in response
+///3. >./client https://syou551.dev
+///   Server: cloudflare
+///   Content-Lenght isn't included in response
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <netdb.h>
@@ -17,7 +28,6 @@ int main(int argc, char const *argv[])
 
   int tcpsock;
   int proxyport = 0;
-  int serverport = 80;
 
   char* res_tok;
   char* proxyname;
@@ -108,7 +118,7 @@ int main(int argc, char const *argv[])
     res_tok = strtok(NULL,tok);
   }
 
-  if(flag[1] != 1)printf("Content-Lenght isn't included in response\n");
+  if(flag[1] != 1)printf("Content-Length isn't included in response\n");
   close(tcpsock);             /* ソケットを閉じる */
   exit(EXIT_SUCCESS);
 }
