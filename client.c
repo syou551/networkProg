@@ -10,7 +10,7 @@
 #define PROXYPORT 8080  /* プロキシサーバのポート番号 */
 #define BUFSIZE 1024    /* バッファサイズ */
 
-int main(int argc, char** argv)
+int main(int argc, char const *argv[])
 {
   struct hostent *server_host;
   struct sockaddr_in server_adrs;
@@ -25,7 +25,7 @@ int main(int argc, char** argv)
   int strsize;
 
   char* serverName = argv[1];
-  printf("%s",serverName);
+
   if(argc >= 3){
     proxyname = argv[2];
     proxyport = atoi(argv[3]);
@@ -61,20 +61,7 @@ int main(int argc, char** argv)
     exit(EXIT_FAILURE);
   }
   printf("please enter HTTP command: ");
-  /* キーボードから文字列を入力してサーバに送信 */
-  //fgets(k_buf,BUFSIZE,stdin);
-  // while(*k_buf != '\n' ){ /* 空行が入力されるまで繰り返し */
-  //   strsize = strlen(k_buf);
-  //   k_buf[strsize-1] = 0;   /* 末尾の改行コードを消す */
-  //   int ret = snprintf(s_buf, BUFSIZE, "%s\r\n",k_buf); /* HTTPの改行コードは \r\n */
 
-  //   /* 文字列をサーバに送信する */
-  //   if( send(tcpsock, s_buf, strsize+1, 0) == -1 ){
-  //     fprintf(stderr,"send()");
-  //     exit(EXIT_FAILURE);
-  //   }
-  //  fgets(k_buf,BUFSIZE,stdin);
-  // }
   if(proxyport == 0){
     char command[] = "GET / HTTP/1.1\r\n";
     strsize = strlen(command);
