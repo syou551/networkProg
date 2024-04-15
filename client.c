@@ -7,7 +7,7 @@
 ///   Content-Length isn't included in response
 ///3. >./client https://syou551.dev
 ///   Server: cloudflare
-///   Content-Lenght isn't included in response
+///   Content-Length isn't included in response
 
 #include <stdio.h>
 #include <stdlib.h>
