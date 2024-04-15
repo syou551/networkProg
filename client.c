@@ -19,20 +19,27 @@ int main(int argc, char const *argv[])
   int proxyport = 0;
   int serverport = 80;
 
-  
+  char* res_tok;
   char* proxyname;
   char k_buf[BUFSIZE], s_buf[BUFSIZE], r_buf[BUFSIZE];
-  int strsize;
+  int strsize,index=0;
 
   if(argc >= 3){
     proxyport = atoi(argv[3]);
   }
 
   /* サーバ名をアドレス(hostent構造体)に変換する */
+  if(strstr(argv[1],"https")) {
+    index = 8;
+  }
+  else if(strstr(argv[1],"http")){
+    index = 7;
+  }
+  //printf("%s\n",argv[1]+index);
   if(proxyport != 0){
     server_host =  gethostbyname(argv[2]) ;
   }else{
-    server_host = gethostbyname(argv[1]);
+    server_host = gethostbyname(argv[1]+index);
   }
   if(server_host == NULL){
     fprintf(stderr,"gethostbyname()");
@@ -57,11 +64,11 @@ int main(int argc, char const *argv[])
     fprintf(stderr,"connect");
     exit(EXIT_FAILURE);
   }
-  printf("please enter HTTP command: ");
 
   if(proxyport == 0){
-    char command[BUFSIZE] = "GET / HTTP/1.1\r\nHost: \r\n";
-    strcat(command, server_host->h_addr_list[0]);
+    char command[BUFSIZE] = "GET / HTTP/1.1\r\nHost: ";
+    strcat(command, argv[1]+index);
+    strcat(command, "\r\n");
     strsize = strlen(command);
     if(send(tcpsock, command, strsize, 0) == -1){
       printf("Error; can't send HTTP command");
@@ -78,17 +85,30 @@ int main(int argc, char const *argv[])
     }
   }
   send(tcpsock, "\r\n", 2, 0); /* HTTPのメソッド（コマンド）の終わりは空行 */
-  printf("Send commands\n");
+
   /* サーバから文字列を受信する */
   if((strsize= recv(tcpsock, r_buf, BUFSIZE-1, 0) ) == -1){
     fprintf(stderr,"recv()");
     exit(EXIT_FAILURE);
   }
   r_buf[strsize] = '\0';
- 
-  /* 受信した文字列を画面に書く */
-  printf("%s",r_buf);
 
+  char* tok = "\r\n";
+  res_tok = strtok(r_buf,tok);
+  int flag[2] = {0,0};
+  while(res_tok != NULL){
+    if(strstr(res_tok,"Server:")){
+      printf("%s\n",res_tok);
+      flag[0] = 1;
+    }
+    else if(strstr(res_tok, "Content-Length:")){
+      printf("%s\n",res_tok);
+      flag[1] = 1;
+    }
+    res_tok = strtok(NULL,tok);
+  }
+
+  if(flag[1] != 1)printf("Content-Lenght isn't included in response\n");
   close(tcpsock);             /* ソケットを閉じる */
   exit(EXIT_SUCCESS);
 }
