@@ -7,7 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define PROXYPORT 8080  /* プロキシサーバのポート番号 */
+#define SERVERPORT 80  /* プロキシサーバのポート番号 */
 #define BUFSIZE 1024    /* バッファサイズ */
 
 int main(int argc, char const *argv[])
@@ -50,7 +50,7 @@ int main(int argc, char const *argv[])
   memset(&server_adrs, 0, sizeof(server_adrs));
   server_adrs.sin_family = AF_INET;
   if(proxyport != 0)server_adrs.sin_port =  htons(proxyport);
-  else server_adrs.sin_port =  htons(serverport);
+  else server_adrs.sin_port =  htons(SERVERPORT);
   memcpy(&server_adrs.sin_addr, server_host->h_addr_list[0], server_host->h_length);
 
   /* ソケットをSTREAMモードで作成する */
