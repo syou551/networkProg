@@ -24,18 +24,15 @@ int main(int argc, char const *argv[])
   char k_buf[BUFSIZE], s_buf[BUFSIZE], r_buf[BUFSIZE];
   int strsize;
 
-  char* serverName = argv[1];
-  
   if(argc >= 3){
-    proxyname = argv[2];
     proxyport = atoi(argv[3]);
   }
 
   /* サーバ名をアドレス(hostent構造体)に変換する */
   if(proxyport != 0){
-    server_host =  gethostbyname(proxyname) ;
+    server_host =  gethostbyname(argv[2]) ;
   }else{
-    server_host = gethostbyname(serverName);
+    server_host = gethostbyname(argv[1]);
   }
   if(server_host == NULL){
     fprintf(stderr,"gethostbyname()");
@@ -72,7 +69,7 @@ int main(int argc, char const *argv[])
     }
   }else{
     char command[] = "GET ";
-    strcat(command, serverName);
+    strcat(command, argv[1]);
     strcat(command, " HTTP/1.1\r\n");
     strsize = strlen(command);
     if(send(tcpsock, command, strsize, 0) == -1){
