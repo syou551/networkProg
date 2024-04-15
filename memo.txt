@@ -1,0 +1,20 @@
+HTTP/1.1 200 OK
+Date: Mon, 15 Apr 2024 05:10:06 GMT
+Content-Type: text/html; charset=utf-8
+Access-Control-Allow-Origin: *
+Cache-Control: public, max-age=0, must-revalidate
+Vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Url, Accept-Encoding
+referrer-policy: strict-origin-when-cross-origin
+x-content-type-options: nosniff
+x-matched-path: /
+x-next-cache-tags: _N_T_/layout,_N_T_/(main)/layout,_N_T_/(main)/page,_N_T_/
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=tFkUN4birJ7AF7ZJVXlUlXzMWwqv0QN8LxI%2FFF4GvcyqPgLW%2BZDfUhGeqH5zYfI1L2ckpC3A31giYXEV7csltldJKWrFma%2Fb5CLYorWT8z%2FSET5I4bGp801W1Cw4Uw%3D%3D"}],"group":"cf-nel","max_age":604800}
+NEL: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+CF-Cache-Status: DYNAMIC
+Server: cloudflare
+CF-RAY: 87496d615aedf6fa-NRT
+alt-svc: h3=":443"; ma=86400
+X-Cache: MISS from sys11proxy01-8080
+X-Cache-Lookup: MISS from sys11proxy01-8080:8080
+Transfer-Encoding: chunked
+Via: 1.1 sys11proxy01-8080
