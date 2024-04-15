@@ -17,7 +17,7 @@ int main(int argc, char const *argv[])
 
   int tcpsock;
   int proxyport = 0;
-  int serverport = 0;
+  int serverport = 80;
 
   //char proxyname[] = "proxy.cis.kit.ac.jp"; /*プロキシサーバ */
   char* proxyname;
@@ -25,7 +25,7 @@ int main(int argc, char const *argv[])
   int strsize;
 
   char* serverName = argv[1];
-
+  
   if(argc >= 3){
     proxyname = argv[2];
     proxyport = atoi(argv[3]);
@@ -63,7 +63,8 @@ int main(int argc, char const *argv[])
   printf("please enter HTTP command: ");
 
   if(proxyport == 0){
-    char command[] = "GET / HTTP/1.1\r\n";
+    char command[] = "GET / HTTP/1.1\r\nHost: \r\n";
+    strcat(command, server_host->h_addr_list[0]);
     strsize = strlen(command);
     if(send(tcpsock, command, strsize, 0) == -1){
       printf("Error; can't send HTTP command");
