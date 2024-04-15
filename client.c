@@ -46,7 +46,8 @@ int main()
   }
   printf("please enter HTTP command: ");
   /* キーボードから文字列を入力してサーバに送信 */
-  while(  fgets(k_buf,BUFSIZE,stdin) != '\n' ){ /* 空行が入力されるまで繰り返し */
+  fgets(k_buf,BUFSIZE,stdin);
+  while(*k_buf != '\n' ){ /* 空行が入力されるまで繰り返し */
     strsize = strlen(k_buf);
     k_buf[strsize-1] = 0;   /* 末尾の改行コードを消す */
     int ret = snprintf(s_buf, BUFSIZE, "%s\r\n",k_buf); /* HTTPの改行コードは \r\n */
@@ -56,6 +57,7 @@ int main()
       fprintf(stderr,"send()");
       exit(EXIT_FAILURE);
     }
+   fgets(k_buf,BUFSIZE,stdin);
   }
   send(tcpsock, "\r\n", 2, 0); /* HTTPのメソッド（コマンド）の終わりは空行 */
 
