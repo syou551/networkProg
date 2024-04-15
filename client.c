@@ -19,7 +19,7 @@ int main(int argc, char const *argv[])
   int proxyport = 0;
   int serverport = 80;
 
-  //char proxyname[] = "proxy.cis.kit.ac.jp"; /*プロキシサーバ */
+  
   char* proxyname;
   char k_buf[BUFSIZE], s_buf[BUFSIZE], r_buf[BUFSIZE];
   int strsize;
@@ -60,7 +60,7 @@ int main(int argc, char const *argv[])
   printf("please enter HTTP command: ");
 
   if(proxyport == 0){
-    char command[] = "GET / HTTP/1.1\r\nHost: \r\n";
+    char command[BUFSIZE] = "GET / HTTP/1.1\r\nHost: \r\n";
     strcat(command, server_host->h_addr_list[0]);
     strsize = strlen(command);
     if(send(tcpsock, command, strsize, 0) == -1){
@@ -68,7 +68,7 @@ int main(int argc, char const *argv[])
       exit(EXIT_FAILURE);
     }
   }else{
-    char command[] = "GET ";
+    char command[BUFSIZE] = "GET ";
     strcat(command, argv[1]);
     strcat(command, " HTTP/1.1\r\n");
     strsize = strlen(command);
