@@ -10,28 +10,44 @@
 #define PROXYPORT 8080  /* プロキシサーバのポート番号 */
 #define BUFSIZE 1024    /* バッファサイズ */
 
-int main()
+int main(int argc, char** argv)
 {
   struct hostent *server_host;
-  struct sockaddr_in proxy_adrs;
+  struct sockaddr_in server_adrs;
 
   int tcpsock;
+  int proxyport = 0;
+  int serverport = 0;
 
-  char proxyname[] = "proxy.cis.kit.ac.jp"; /*プロキシサーバ */
+  //char proxyname[] = "proxy.cis.kit.ac.jp"; /*プロキシサーバ */
+  char* proxyname;
   char k_buf[BUFSIZE], s_buf[BUFSIZE], r_buf[BUFSIZE];
   int strsize;
 
+  char* serverName = argv[1];
+  printf("%s",serverName);
+  if(argc >= 3){
+    proxyname = argv[2];
+    proxyport = atoi(argv[3]);
+  }
+
   /* サーバ名をアドレス(hostent構造体)に変換する */
-  if((server_host =  gethostbyname(proxyname) ) == NULL){
+  if(proxyport != 0){
+    server_host =  gethostbyname(proxyname) ;
+  }else{
+    server_host = gethostbyname(serverName);
+  }
+  if(server_host == NULL){
     fprintf(stderr,"gethostbyname()");
     exit(EXIT_FAILURE);
   }
 
   /* サーバの情報をsockaddr_in構造体に格納する */
-  memset(&proxy_adrs, 0, sizeof(proxy_adrs));
-  proxy_adrs.sin_family = AF_INET;
-  proxy_adrs.sin_port =  htons(PROXYPORT);
-  memcpy(&proxy_adrs.sin_addr, server_host->h_addr_list[0], server_host->h_length);
+  memset(&server_adrs, 0, sizeof(server_adrs));
+  server_adrs.sin_family = AF_INET;
+  if(proxyport != 0)server_adrs.sin_port =  htons(proxyport);
+  else server_adrs.sin_port =  htons(serverport);
+  memcpy(&server_adrs.sin_addr, server_host->h_addr_list[0], server_host->h_length);
 
   /* ソケットをSTREAMモードで作成する */
   if((tcpsock =  socket(PF_INET, SOCK_STREAM, 0)  ) == -1){
@@ -40,27 +56,44 @@ int main()
   }
 
   /* ソケットにサーバの情報を対応づけてサーバに接続する */
-  if( connect(tcpsock, (struct sockaddr *)&proxy_adrs, sizeof(proxy_adrs)) == -1){
+  if( connect(tcpsock, (struct sockaddr *)&server_adrs, sizeof(server_adrs)) == -1){
     fprintf(stderr,"connect");
     exit(EXIT_FAILURE);
   }
   printf("please enter HTTP command: ");
   /* キーボードから文字列を入力してサーバに送信 */
-  fgets(k_buf,BUFSIZE,stdin);
-  while(*k_buf != '\n' ){ /* 空行が入力されるまで繰り返し */
-    strsize = strlen(k_buf);
-    k_buf[strsize-1] = 0;   /* 末尾の改行コードを消す */
-    int ret = snprintf(s_buf, BUFSIZE, "%s\r\n",k_buf); /* HTTPの改行コードは \r\n */
+  //fgets(k_buf,BUFSIZE,stdin);
+  // while(*k_buf != '\n' ){ /* 空行が入力されるまで繰り返し */
+  //   strsize = strlen(k_buf);
+  //   k_buf[strsize-1] = 0;   /* 末尾の改行コードを消す */
+  //   int ret = snprintf(s_buf, BUFSIZE, "%s\r\n",k_buf); /* HTTPの改行コードは \r\n */
 
-    /* 文字列をサーバに送信する */
-    if( send(tcpsock, s_buf, strsize+1, 0) == -1 ){
-      fprintf(stderr,"send()");
+  //   /* 文字列をサーバに送信する */
+  //   if( send(tcpsock, s_buf, strsize+1, 0) == -1 ){
+  //     fprintf(stderr,"send()");
+  //     exit(EXIT_FAILURE);
+  //   }
+  //  fgets(k_buf,BUFSIZE,stdin);
+  // }
+  if(proxyport == 0){
+    char command[] = "GET / HTTP/1.1\r\n";
+    strsize = strlen(command);
+    if(send(tcpsock, command, strsize, 0) == -1){
+      printf("Error; can't send HTTP command");
       exit(EXIT_FAILURE);
     }
-   fgets(k_buf,BUFSIZE,stdin);
+  }else{
+    char command[] = "GET ";
+    strcat(command, serverName);
+    strcat(command, " HTTP/1.1\r\n");
+    strsize = strlen(command);
+    if(send(tcpsock, command, strsize, 0) == -1){
+      printf("Error; can't send HTTP command");
+      exit(EXIT_FAILURE);
+    }
   }
   send(tcpsock, "\r\n", 2, 0); /* HTTPのメソッド（コマンド）の終わりは空行 */
-  printf("send commands\n");
+  printf("Send commands\n");
   /* サーバから文字列を受信する */
   if((strsize= recv(tcpsock, r_buf, BUFSIZE-1, 0) ) == -1){
     fprintf(stderr,"recv()");
