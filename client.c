@@ -117,7 +117,7 @@ int main(int argc, char const *argv[])
     }
     res_tok = strtok(NULL,tok);
   }
-
+  if(flag[0] != 1)printf("Server isn't included in response\n"); 
   if(flag[1] != 1)printf("Content-Length isn't included in response\n");
   close(tcpsock);             /* ソケットを閉じる */
   exit(EXIT_SUCCESS);
