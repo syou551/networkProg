@@ -1,7 +1,7 @@
 #
 # Makefile for tcp_echo
 #
-MYLIBDIR=mynet
+MYLIBDIR=./mynet
 MYLIB=-lmynet -lcurses
 CFLAGS=-I${MYLIBDIR} -L${MYLIBDIR}
 
