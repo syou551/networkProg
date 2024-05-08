@@ -44,10 +44,9 @@ int main()
         char* buf = malloc(BUFSIZE);
         /* 文字列をクライアントから受信する */
         if((strsize=recv(sock_accepted, rbuf, BUFSIZE, 0)) == -1){
-        fprintf(stderr,"recv()");
-        exit(EXIT_FAILURE);
+            fprintf(stderr,"recv()");
+            exit(EXIT_FAILURE);
         }
-        printf("%s",rbuf);
 
         if(!strcmp(rbuf,"exit\r\n")) break;
         else if(!strcmp(rbuf,"list\r\n")){
