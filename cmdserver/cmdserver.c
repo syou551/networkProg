@@ -1,15 +1,23 @@
 #include "../mynet/mynet.h"
 
-#define PORT 50000         /* ポート番号 ←適当に書き換える */
+//#define PORT 50000         /* ポート番号 ←適当に書き換える */
 #define BUFSIZE 500   /* バッファサイズ */
 
-int main()
+int main(int argc, char* argv[])
 {
   int sock_listen, sock_accepted;
   int strsize,flag=1;
+  int port;
+
+  if(argc<2){
+    printf("Error: lack of argument.Please input port number.\n");
+    return(-1);
+  }else{
+    port=atoi(argv[1]);
+  }
 
   /* 待ち受け用ソケットをSTREAMモードで作成する */
-  sock_listen = init_tcpserver(PORT, 5);
+  sock_listen = init_tcpserver(port, 5);
 
   /* クライアントの接続を受け付ける */
   while(1){
@@ -44,10 +52,9 @@ int main()
         char* buf = malloc(BUFSIZE);
         /* 文字列をクライアントから受信する */
         if((strsize=recv(sock_accepted, rbuf, BUFSIZE, 0)) == -1){
-        fprintf(stderr,"recv()");
-        exit(EXIT_FAILURE);
+            fprintf(stderr,"recv()");
+            exit(EXIT_FAILURE);
         }
-        printf("%s",rbuf);
 
         if(!strcmp(rbuf,"exit\r\n")) break;
         else if(!strcmp(rbuf,"list\r\n")){
