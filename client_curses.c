@@ -1,4 +1,4 @@
-#include "./mynet/mynet.h"
+#include "mynet.h"
 #include <curses.h>
 
 #define PORT 50000         /* ポート番号 */
