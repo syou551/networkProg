@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
     printf("You didn't input port. Use default port 50000 ...\n");
   }else{
     port=atoi(argv[1]);
-    if(argv[1] != '0' && port == 0){
+    if(*argv[1] != '0' && port == 0){
         printf("Error: Invalid port! Please input available port!\n");
         return(-1);
     }
@@ -94,7 +94,6 @@ int main(int argc, char* argv[])
                     while(fgets(buf, sizeof(buf),fp)!=NULL){
                         strcat(str, buf);
                         strsize = strlen(str);
-                        if(strstr(buf,"No such file or directory")!= NULL) break;
                     }
                     pclose(fp);
                     strcpy(buf, str);
