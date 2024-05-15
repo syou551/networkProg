@@ -1,19 +1,21 @@
 #include "../mynet/mynet.h"
 
-//#define PORT 50000         /* ポート番号 ←適当に書き換える */
 #define BUFSIZE 500   /* バッファサイズ */
 
 int main(int argc, char* argv[])
 {
   int sock_listen, sock_accepted;
   int strsize,flag=1;
-  int port;
+  int port=50000;
 
   if(argc<2){
-    printf("Error: lack of argument.Please input port number.\n");
-    return(-1);
+    printf("You didn't input port. Use default port 50000 ...\n");
   }else{
     port=atoi(argv[1]);
+    if(argv[1] != '0' && port == 0){
+        printf("Error: Invalid port! Please input available port!\n");
+        return(-1);
+    }
   }
 
   /* 待ち受け用ソケットをSTREAMモードで作成する */
