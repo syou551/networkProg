@@ -61,43 +61,46 @@ int main(int argc, char* argv[])
         if(!strcmp(rbuf,"exit\r\n")) break;
         else if(!strcmp(rbuf,"list\r\n")){
             FILE *fp;
-            if((fp = popen("ls ~/Desktop/work","r"))== NULL){
+            if((fp = popen("ls ~/work","r"))== NULL){
                 strcpy(buf, "list cmd internal Error\n");
                 strsize = strlen(buf);
             }else{
-                char* str=malloc(BUFSIZE);
                 while(fgets(buf, sizeof(buf),fp)!=NULL){
-                    strcat(str, buf);
-                    strsize = strlen(str);
+                    strsize = strlen(buf);
+                    if(send(sock_accepted, buf, strsize, 0) == -1 ){
+                        fprintf(stderr,"send()");
+                        exit(EXIT_FAILURE);
+                    }
                 }
                 pclose(fp);
-                strcpy(buf, str);
-                free(str);
+                strsize = 0;
             }
-        }else if(strsize >= 7){
+        }else if(!strstr(rbuf,"type")==NULL){
             FILE *fp;
-            char path[BUFSIZE] = "/Users/nakatahiroto/Desktop/work/";
-
-            rbuf[strsize-2] = '\0';
+            char cmd[BUFSIZE] = "cat ~/work/";
+            
             if(strstr(rbuf,"/")!=NULL){
                 printf("Error\n");
-                strcpy(buf, "Error:No supported filename!\n");
+                strcpy(buf, "Error:No supported filename!");
                 strsize = strlen(buf);
             }else{
-                strcat(path,rbuf+5);
-                if((fp=fopen(path,"r"))==NULL){
+                strcat(cmd,rbuf+5);
+                strsize = strlen(cmd);
+                cmd[strsize-2] = '\0';
+                if((fp=popen(cmd,"r"))==NULL){
                     printf("Error\n");
-                    strcpy(buf, "Error:Not found this name file\n");
+                    strcpy(buf, "Error:Not found this name file");
                     strsize = strlen(buf);
                 }else{
-                    char *str = malloc(BUFSIZE);
                     while(fgets(buf, sizeof(buf),fp)!=NULL){
-                        strcat(str, buf);
-                        strsize = strlen(str);
+                        strsize = strlen(buf);
+                        if(send(sock_accepted, buf, strsize, 0) == -1 ){
+                            fprintf(stderr,"send()");
+                            exit(EXIT_FAILURE);
+                        }
                     }
                     pclose(fp);
-                    strcpy(buf, str);
-                    free(str);
+                    strsize = 0;
                 }
             }
         }else{
@@ -107,7 +110,8 @@ int main(int argc, char* argv[])
         }
 
         /* 文字列をクライアントに送信する */
-        if(send(sock_accepted, buf, strsize, 0) == -1 ){
+        if(strsize == 0) {}
+        else if(send(sock_accepted, buf, strsize, 0) == -1 ){
             fprintf(stderr,"send()");
             exit(EXIT_FAILURE);
         }
