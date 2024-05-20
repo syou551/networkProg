@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
     if(strcmp(pbuf,password)){
-        if(send(sock_accepted, "Invalid passsword\n", 18, 0) == -1 ){
+        if(send(sock_accepted, "Invalid passsword\r\n", 18, 0) == -1 ){
             fprintf(stderr,"send()");
             exit(EXIT_FAILURE);
         }
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
         else if(!strcmp(rbuf,"list\r\n")){
             FILE *fp;
             if((fp = popen("ls ~/work","r"))== NULL){
-                strcpy(buf, "list cmd internal Error\n");
+                strcpy(buf, "list cmd internal Error\r\n");
                 strsize = strlen(buf);
             }else{
                 while(fgets(buf, sizeof(buf),fp)!=NULL){
@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
             
             if(strstr(rbuf,"/")!=NULL){
                 printf("Error\n");
-                strcpy(buf, "Error:No supported filename!");
+                strcpy(buf, "Error:No supported filename!\r\n");
                 strsize = strlen(buf);
             }else{
                 strcat(cmd,rbuf+5);
@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
                 cmd[strsize-2] = '\0';
                 if((fp=popen(cmd,"r"))==NULL){
                     printf("Error\n");
-                    strcpy(buf, "Error:Not found this name file");
+                    strcpy(buf, "Error:Not found this name file\r\n");
                     strsize = strlen(buf);
                 }else{
                     while(fgets(buf, sizeof(buf),fp)!=NULL){
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
             }
         }else{
             printf("%s",rbuf);
-            strcpy(buf, "No Supported Command\n");
+            strcpy(buf, "No Supported Command\r\n");
             strsize = strlen(buf);
         }
 
