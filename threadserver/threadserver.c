@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
   /* 引数のチェックと使用法の表示 */
   if( argc != 4 ){
-    fprintf(stderr,"Usage: %s Port_number Num_of_thread\n", argv[0]);
+    fprintf(stderr,"Usage: %s Port_number Num_of_thread mode\n", argv[0]);
     exit(EXIT_FAILURE);
   }
 
@@ -78,10 +78,22 @@ void echo_fork(int sock_listen, int thrnum)
       while(n){
         /* クライアントの接続を受け付ける */
         sock_accepted = accept(sock_listen, NULL, NULL);
+        /*processの使用状況調査用*/
+        char no[20] = "Process id.";
+        char id[10];
+        sprintf(id, "%d", getpid());
+        strcat(no,id);
+        strcat(no,"\r\n");
+        if(send(sock_accepted, no, strlen(no), 0) == -1 ){
+            fprintf(stderr,"send()");
+            exit(EXIT_FAILURE);
+        }
         n = service(sock_accepted);
 
         close(sock_accepted);
       }
+      //デバッグ用コマンドkillで強制終了
+      exit(EXIT_SUCCESS);
     }
     else if(child>0){
       /* parent's process */
@@ -122,7 +134,16 @@ void * echo_thread(void *arg)
   /* クライアントの接続を受け付ける */
   while(1){
     sock_accepted = accept(tharg->sock, NULL, NULL);
-
+    /*threadの使用状況調査用*/
+    char id[20] = "Thread id.";
+    char no[10];
+    sprintf(no, "%d", tharg->id);
+    strcat(id,no);
+    strcat(id,"\r\n");
+    if(send(sock_accepted, no, strlen(no), 0) == -1 ){
+        fprintf(stderr,"send()");
+        exit(EXIT_FAILURE);
+    }
     service(sock_accepted);
 
     close(sock_accepted);
@@ -130,10 +151,27 @@ void * echo_thread(void *arg)
   exit(EXIT_SUCCESS);
 }
 
+/* 文字列の最後の改行を削除する */
+char * chop_nl(char *s)
+{
+int len;
+len = strlen(s); // sが\0で終端されていることが前提。strnlen()を使う方が安全。
+
+if( len>0 && (s[len-1]=='\n' || s[len-1]=='\r') ){
+s[len-1] = '\0';
+if( len>1 && s[len-2]=='\r'){
+s[len-2] = '\0';
+}
+}
+
+return s;
+}
+
+
 int service(int sock_accepted){
     int strsize,flag = 1;
     //パスワード認証
-    char password[] = "Amagasaki2022\r\n";
+    char password[] = "Amagasaki2022";
     if(send(sock_accepted, "Password: ", 9, 0) == -1 ){
         fprintf(stderr,"send()");
         exit(EXIT_FAILURE);
@@ -143,6 +181,7 @@ int service(int sock_accepted){
         fprintf(stderr,"recv()");
         exit(EXIT_FAILURE);
     }
+    pbuf = chop_nl(pbuf);
     if(strcmp(pbuf,password)){
         if(send(sock_accepted, "Invalid passsword\r\n", 18, 0) == -1 ){
             fprintf(stderr,"send()");
@@ -164,12 +203,11 @@ int service(int sock_accepted){
             fprintf(stderr,"recv()");
             exit(EXIT_FAILURE);
         }
-
-        if(!strcmp(rbuf,"exit\r\n")) break;
-        else if(!strcmp(rbuf,"kill\r\n")) { //デバッグ時の強制終了コマンド
-          close(sock_accepted);
+        rbuf = chop_nl(rbuf);
+        if(!strcmp(rbuf,"exit")) break;
+        else if(!strcmp(rbuf,"kill")) { //デバッグ時の強制終了コマンド
           return 0;
-        }else if(!strcmp(rbuf,"list\r\n")){
+        }else if(!strcmp(rbuf,"list")){
             FILE *fp;
             if((fp = popen("ls ~/work","r"))== NULL){
                 strcpy(buf, "list cmd internal Error\r\n");
@@ -228,4 +266,5 @@ int service(int sock_accepted){
         free(rbuf);
         free(buf);
     }
+    return 1;
 }
