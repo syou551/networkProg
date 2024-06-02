@@ -79,15 +79,15 @@ void echo_fork(int sock_listen, int thrnum)
         /* クライアントの接続を受け付ける */
         sock_accepted = accept(sock_listen, NULL, NULL);
         /*processの使用状況調査用*/
-        char no[20] = "Process id.";
-        char id[10];
-        sprintf(id, "%d", getpid());
-        strcat(no,id);
-        strcat(no,"\r\n");
-        if(send(sock_accepted, no, strlen(no), 0) == -1 ){
-            fprintf(stderr,"send()");
-            exit(EXIT_FAILURE);
-        }
+        // char no[20] = "Process id.";
+        // char id[10];
+        // sprintf(id, "%d", getpid());
+        // strcat(no,id);
+        // strcat(no,"\r\n");
+        // if(send(sock_accepted, no, strlen(no), 0) == -1 ){
+        //     fprintf(stderr,"send()");
+        //     exit(EXIT_FAILURE);
+        // }
         n = service(sock_accepted);
 
         close(sock_accepted);
@@ -135,15 +135,15 @@ void * echo_thread(void *arg)
   while(1){
     sock_accepted = accept(tharg->sock, NULL, NULL);
     /*threadの使用状況調査用*/
-    char id[20] = "Thread id.";
-    char no[10];
-    sprintf(no, "%d", tharg->id);
-    strcat(id,no);
-    strcat(id,"\r\n");
-    if(send(sock_accepted, no, strlen(no), 0) == -1 ){
-        fprintf(stderr,"send()");
-        exit(EXIT_FAILURE);
-    }
+    // char id[20] = "Thread id.";
+    // char no[10];
+    // sprintf(no, "%d", tharg->id);
+    // strcat(id,no);
+    // strcat(id,"\r\n");
+    // if(send(sock_accepted, no, strlen(no), 0) == -1 ){
+    //     fprintf(stderr,"send()");
+    //     exit(EXIT_FAILURE);
+    // }
     service(sock_accepted);
 
     close(sock_accepted);
@@ -205,9 +205,10 @@ int service(int sock_accepted){
         }
         rbuf = chop_nl(rbuf);
         if(!strcmp(rbuf,"exit")) break;
-        else if(!strcmp(rbuf,"kill")) { //デバッグ時の強制終了コマンド
-          return 0;
-        }else if(!strcmp(rbuf,"list")){
+        // else if(!strcmp(rbuf,"kill")) { //デバッグ時の強制終了コマンド
+        //   return 0;
+        //}
+        else if(!strcmp(rbuf,"list")){
             FILE *fp;
             if((fp = popen("ls ~/work","r"))== NULL){
                 strcpy(buf, "list cmd internal Error\r\n");
