@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
     printf("You didn't input port. Use default port 50000 ...\n");
   }else{
     port=atoi(argv[1]);
-    if(argv[1] != '0' && port == 0){
+    if(*argv[1] != '0' && port == 0){
         printf("Error: Invalid port! Please input available port!\n");
         return(-1);
     }
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
     if(strcmp(pbuf,password)){
-        if(send(sock_accepted, "Invalid passsword\n", 18, 0) == -1 ){
+        if(send(sock_accepted, "Invalid passsword\r\n", 18, 0) == -1 ){
             fprintf(stderr,"send()");
             exit(EXIT_FAILURE);
         }
@@ -61,54 +61,57 @@ int main(int argc, char* argv[])
         if(!strcmp(rbuf,"exit\r\n")) break;
         else if(!strcmp(rbuf,"list\r\n")){
             FILE *fp;
-            if((fp = popen("ls ~/Desktop/work","r"))== NULL){
-                strcpy(buf, "list cmd internal Error\n");
+            if((fp = popen("ls ~/work","r"))== NULL){
+                strcpy(buf, "list cmd internal Error\r\n");
                 strsize = strlen(buf);
             }else{
-                char* str=malloc(BUFSIZE);
                 while(fgets(buf, sizeof(buf),fp)!=NULL){
-                    strcat(str, buf);
-                    strsize = strlen(str);
+                    strsize = strlen(buf);
+                    if(send(sock_accepted, buf, strsize, 0) == -1 ){
+                        fprintf(stderr,"send()");
+                        exit(EXIT_FAILURE);
+                    }
                 }
                 pclose(fp);
-                strcpy(buf, str);
-                free(str);
+                strsize = 0;
             }
-        }else if(strsize >= 7){
+        }else if(!strstr(rbuf,"type")==NULL){
             FILE *fp;
-            char path[BUFSIZE] = "/Users/nakatahiroto/Desktop/work/";
-
-            rbuf[strsize-2] = '\0';
+            char cmd[BUFSIZE] = "cat ~/work/";
+            
             if(strstr(rbuf,"/")!=NULL){
                 printf("Error\n");
-                strcpy(buf, "Error:No supported filename!\n");
+                strcpy(buf, "Error:No supported filename!\r\n");
                 strsize = strlen(buf);
             }else{
-                strcat(path,rbuf+5);
-                if((fp=fopen(path,"r"))==NULL){
+                strcat(cmd,rbuf+5);
+                strsize = strlen(cmd);
+                cmd[strsize-2] = '\0';
+                if((fp=popen(cmd,"r"))==NULL){
                     printf("Error\n");
-                    strcpy(buf, "Error:Not found this name file\n");
+                    strcpy(buf, "Error:Not found this name file\r\n");
                     strsize = strlen(buf);
                 }else{
-                    char *str = malloc(BUFSIZE);
                     while(fgets(buf, sizeof(buf),fp)!=NULL){
-                        strcat(str, buf);
-                        strsize = strlen(str);
-                        if(strstr(buf,"No such file or directory")!= NULL) break;
+                        strsize = strlen(buf);
+                        if(send(sock_accepted, buf, strsize, 0) == -1 ){
+                            fprintf(stderr,"send()");
+                            exit(EXIT_FAILURE);
+                        }
                     }
                     pclose(fp);
-                    strcpy(buf, str);
-                    free(str);
+                    strsize = 0;
                 }
             }
         }else{
             printf("%s",rbuf);
-            strcpy(buf, "No Supported Command\n");
+            strcpy(buf, "No Supported Command\r\n");
             strsize = strlen(buf);
         }
 
         /* 文字列をクライアントに送信する */
-        if(send(sock_accepted, buf, strsize, 0) == -1 ){
+        if(strsize == 0) {}
+        else if(send(sock_accepted, buf, strsize, 0) == -1 ){
             fprintf(stderr,"send()");
             exit(EXIT_FAILURE);
         }

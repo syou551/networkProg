@@ -34,15 +34,15 @@ int main(int argc, char *argv[])
       /* Child process */
       close(sock_listen);
       do{
-	/* 文字列をクライアントから受信する */
-	if((strsize=recv(sock_accepted, buf, BUFSIZE, 0)) == -1){
-	  exit_errmesg("recv()");
-	}
+        /* 文字列をクライアントから受信する */
+        if((strsize=recv(sock_accepted, buf, BUFSIZE, 0)) == -1){
+          exit_errmesg("recv()");
+        }
 
-	/* 文字列をクライアントに送信する */
-	if(send(sock_accepted, buf, strsize, 0) == -1 ){
-	  exit_errmesg("send()");
-	}
+        /* 文字列をクライアントに送信する */
+        if(send(sock_accepted, buf, strsize, 0) == -1 ){
+          exit_errmesg("send()");
+        }
       }while( buf[strsize-1] != '\n' ); /* 改行コードを受信するまで繰り返す */
 
       close(sock_accepted);

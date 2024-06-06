@@ -10,5 +10,7 @@
 * server.c - echo用サーバープログラム（erchoClientのサーバーサイド）
 * client_curses.c - Cursesを用いたサンプルプログラム
 * cmdserver - 課題2のコマンドライクなサーバープログラム
+    > listenするポートを起動時に指定し，クライアント側はtelnetなどで接続
 
-
+* thread - threadを用いたecho用サーバープログラムサンプル
+    > listenポートを起動時に指定
