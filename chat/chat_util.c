@@ -2,9 +2,12 @@
 #include "chat.h"
 #include <stdlib.h>
 #include <sys/select.h>
+#include <ncurses.h>
+#include <locale.h>
 
 #define NAMELENGTH 20 /* ログイン名の長さ制限 */
 #define BUFLEN 500    /* 通信バッファサイズ */
+#define SUBWIN_LINES 2 /* サブウィンドウの行数 */
 
 /* 各クライアントのユーザ情報を格納する構造体の定義 */
 typedef struct{
@@ -153,6 +156,23 @@ static void send_message()
     Send(Client[client_id].sock, Buf, len, 0);
   }
   free(Message);
+}
+
+void init_window(WINDOW **win_main, WINDOW **win_sub)
+{
+  initscr();
+	start_color();
+	init_pair(1, COLOR_WHITE, COLOR_BLACK);
+  init_pair(2, COLOR_GREEN, COLOR_BLACK);
+  // 色の準備
+  *win_main = newwin(LINES - SUBWIN_LINES, COLS, 0, 0); /* Windowを作る */
+  *win_sub  = newwin(SUBWIN_LINES, COLS, LINES-SUBWIN_LINES, 0);
+  scrollok(*win_main, TRUE); /* スクロールを許可する */
+  scrollok(*win_sub, TRUE);
+  wmove(*win_main, 0,20);  /* カーソルを動かす */
+  wprintw(*win_main, "TCP Chat Client Program\n"); /* 文字列を出力 */
+  wrefresh(*win_main);  /* 画面を更新 */
+  wrefresh(*win_sub);
 }
 
 char *chop_nl(char *s)

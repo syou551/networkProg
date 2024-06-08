@@ -2,6 +2,7 @@
     "files.associations": {
         "mynet.h": "c",
         "wait.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "select.h": "c"
     }
 }

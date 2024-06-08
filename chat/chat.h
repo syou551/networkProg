@@ -2,6 +2,7 @@
 #define CHAT_H_
 
 #include "../mynet/mynet.h"
+#include <ncurses.h>
 
 /* サーバメインルーチン */
 void chat_server(int port_number, int n_client);
@@ -23,6 +24,9 @@ int Send(int s, void *buf, size_t len, int flags);
 
 /* 受信関数(エラー処理つき) */
 int Recv(int s, void *buf, size_t len, int flags);
+
+/* ウィンドウの初期化 */
+void init_window(WINDOW **win_main, WINDOW **win_sub);
 
 char *chop_nl(char *s);
 
