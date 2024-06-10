@@ -1,3 +1,7 @@
+/*
+・工夫した点
+受信や送信のラッパ関数を用意することで，他のファイルでの記述を簡略化した．
+*/
 #include "../mynet/mynet.h"
 
 int Accept(int s, struct sockaddr *addr, socklen_t *addrlen)

@@ -28,6 +28,12 @@ int Recv(int s, void *buf, size_t len, int flags);
 /* ウィンドウの初期化 */
 void init_window(WINDOW **win_main, WINDOW **win_sub);
 
+/* メインウィンドウにメッセージを表示 */
+void show_message_main(WINDOW **win_main, char *message);
+
+/* サブウィンドウから入力を受け取る */
+int input_message_sub(WINDOW **win_sub, char *message, int S_BUFSIZE);
+
 char *chop_nl(char *s);
 
 #endif /* CHAT_H_ */

@@ -14,4 +14,4 @@ echo_client: echo_client.o
 	${CC} ${CFLAGS} -o $@ $^ ${MYLIB}
 
 clean:
-	${RM} *.o echo_server echo_client *~
+	${RM} *.o echo_server echo_client echo_client1 echo_server1 *~
