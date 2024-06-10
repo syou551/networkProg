@@ -3,6 +3,7 @@
   - クライアントが全員接続されたら、全員にチャット開始のメッセージを送信するようにした。
   - クライアントが切断された際に、そのクライアントの情報を削除する関数を作成し、クライアントの数を更新するようにした。
   - cursesライブラリを用いて画面のメッセージを表示，入力できるようにするための処理をラッパ関数で用意した
+  - クライアントが全員切断された時は，サーバープログラムもメッセージを表示して終了するようにした
 ・苦労した点
   - クライアントが切断された際に、クライアントの数を更新する処理を実装する点で苦労した。
 */
@@ -39,7 +40,7 @@ static void delete_member(int client_id);
 
 char *chop_nl(char *s);
 
-/* クライアントの初期化 */
+/* サーバーのクライアント情報の初期化 */
 void init_client(int sock_listen, int n_client)
 {
   N_client = n_client;
@@ -71,7 +72,10 @@ void chat_loop()
   printf("Clients had disconnected. Chat server terminated.\n");
 }
 
-/* クライアントのログイン処理 */
+/* 
+サーバーでのクライアントのログイン処理 sockとnameを保存する
+その後，全員にチャット開始のメッセージを送信
+ */
 static int client_login(int sock_listen)
 {
   int client_id,sock_accepted;
@@ -108,7 +112,7 @@ static int client_login(int sock_listen)
   return(sock_accepted);
 }
 
-/* メッセージの受信 */
+/* クライアントからのメッセージの受信 */
 static int receive_message()
 {
   fd_set mask, readfds;
@@ -157,7 +161,7 @@ static void delete_member(int client_id)
   printf("Client[%d] disconnected.\n", client_id);
 }
 
-/* メッセージの送信 */
+/* クライアントへのメッセージの送信 */
 static void send_message()
 {
   int client_id;

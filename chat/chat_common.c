@@ -4,6 +4,7 @@
 */
 #include "../mynet/mynet.h"
 
+/* accept のラッパ関数*/
 int Accept(int s, struct sockaddr *addr, socklen_t *addrlen)
 {
   int r;
@@ -13,6 +14,7 @@ int Accept(int s, struct sockaddr *addr, socklen_t *addrlen)
   return(r);
 }
 
+/* send のラッパ関数*/
 int Send(int s, void *buf, size_t len, int flags)
 {
   int r;
@@ -22,6 +24,7 @@ int Send(int s, void *buf, size_t len, int flags)
   return(r);
 }
 
+/* recv のラッパ関数*/
 int Recv(int s, void *buf, size_t len, int flags)
 {
   int r;
