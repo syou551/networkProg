@@ -39,6 +39,12 @@ void show_message_main(WINDOW **win_main, char *message);
 /* サブウィンドウから入力を受け取る */
 int input_message_sub(WINDOW **win_sub, char *message, int S_BUFSIZE);
 
+void set_sockaddr_in_broadcast(struct sockaddr_in *server_adrs, in_port_t port_number );
+
+int init_udpclient_broadcast(int broadcast_sw);
+
+int init_tcpclient_ip(struct sockaddr_in server_adrs, in_port_t serverport);
+
 char *chop_nl(char *s);
 
 #endif /* IDOBATA_H_ */
