@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 
   /* 引数のチェックと使用法の表示 */
   if( argc < 2 ){
-    fprintf(stderr,"Usage: %s user_name\n", argv[0]);
+    fprintf(stderr,"Usage: %s user_name [port: optional]\n", argv[0]);
     exit(1);
   }
 
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
       close(sock);
       printf("Start as Cliant!\n");
       //クライアントのメインループ
-      client_main(from_adrs, &argv[1], port);
+      client_main(from_adrs, argv[1], port);
     }else{
         printf("Received: %s\n", r_buf);
         printf("Incorrect format response receive!\n");
@@ -66,7 +66,8 @@ int main(int argc, char *argv[])
   }
 
   close(sock);
-  printf("Start as Server!\n");
+  printf("Can't find server! This program is going to finish.\n");
+  //printf("Start as Server!\n");
   //サーバーのメインループ
   //server_main(port);
 

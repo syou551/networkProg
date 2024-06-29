@@ -15,6 +15,7 @@
 
 int init_tcpserver(in_port_t myport, int backlog);
 int init_tcpclient(char *servername, in_port_t serverport);
+int init_tcpclient_ip(struct sockaddr_in server_adrs, in_port_t serverport);
 void exit_errmesg(char *errmesg);
 //udp
 int init_udpserver(in_port_t myport);

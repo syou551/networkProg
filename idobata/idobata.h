@@ -5,6 +5,9 @@
 #include <sys/select.h>
 #include <sys/time.h>
 #include <arpa/inet.h>
+#include <curses.h>
+#include <ncurses.h>
+#include <locale.h>
 
 #define BUFSIZE 1024 /* バッファサイズ */
 #define DEFAULT_PORT 50001       /* ポート番号 */
@@ -26,6 +29,15 @@ int Send(int s, void *buf, size_t len, int flags);
 
 /* 受信関数(エラー処理つき) */
 int Recv(int s, void *buf, size_t len, int flags);
+
+/* ウィンドウの初期化 */
+void init_window(WINDOW **win_main, WINDOW **win_sub);
+
+/* メインウィンドウにメッセージを表示 */
+void show_message_main(WINDOW **win_main, char *message);
+
+/* サブウィンドウから入力を受け取る */
+int input_message_sub(WINDOW **win_sub, char *message, int S_BUFSIZE);
 
 char *chop_nl(char *s);
 
