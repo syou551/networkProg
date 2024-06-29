@@ -57,13 +57,14 @@ void client_main(struct sockaddr_in server_adrs, char *user_name, in_port_t port
       Send(sock, msg, strsize, 0);
       /*ここで送信した文字列も表示*/
       wattrset(win_main,COLOR_PAIR(2));	/* 文字色を変更 */
-      wprintw(win_main,"\t\t%s >From %s\n",chop_nl(s_buf), name);
+      wprintw(win_main,"\t\t[%s] %s\n",user_name, s_buf);
       wrefresh(win_main);
     }
 
     if( FD_ISSET(sock, &readfds) ){
       /* サーバから文字列を受信する */
       strsize = Recv(sock, r_buf, R_BUFSIZE-1, 0);
+      r_buf[strsize] = '\0';
       char *header = strtok(r_buf, " ");
       if(strcmp(header, "MESG") != 0){
         continue;
@@ -75,8 +76,8 @@ void client_main(struct sockaddr_in server_adrs, char *user_name, in_port_t port
         printf("Connection closed.\n");
         break;
       }
-      r_buf[strsize] = '\0';
-      show_message_main(&win_main, r_buf);
+      header = strtok(NULL, "\0");
+      show_message_main(&win_main, header);
     }
 
   }

@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
   if(argc == 3){
     port = (in_port_t)atoi(argv[2]);
   }
+  /* ブロードキャストアドレスを設定 */
   set_sockaddr_in_broadcast(&server_adrs, port);
 
   /* ソケットをSTREAMモードで作成する */
