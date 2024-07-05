@@ -27,13 +27,15 @@ void * client_login(void *arg);
 void action_timeout(int signo);
 
 /* チャットサービスのメインループ */
-void * chat_loop();
+void * chat_loop(void *arg);
 
 /* クライアントメインルーチン */
 void client_main(struct sockaddr_in server_adrs, char *user_name, in_port_t port);
 
 /* クライアントの初期化 */
 void init_client(int sock_listen, int n_client);
+
+void send_message_from_server(char *message);
 
 /* Accept関数(エラー処理つき) */
 int Accept(int s, struct sockaddr *addr, socklen_t *addrlen);

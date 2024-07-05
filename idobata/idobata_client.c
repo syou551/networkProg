@@ -18,7 +18,6 @@ void client_main(struct sockaddr_in server_adrs, char *user_name, in_port_t port
   struct timeval timeout;
   WINDOW *win_main, *win_sub;
 
-  /* ソケットをSTREAMモードで作成する */
   /* 画面の初期化 */
   init_window(&win_main, &win_sub);
 

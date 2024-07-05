@@ -4,7 +4,7 @@
 #define BUFLEN 500    /* 通信バッファサイズ */
 #define SUBWIN_LINES 2 /* サブウィンドウの行数 */
 #define TIMEOUT_SEC 5 /* タイムアウト秒 */
-#define DEBUG
+//#define DEBUG
 
 /* 各クライアントのユーザ情報を格納する構造体の定義 */
 typedef struct _client_info{
@@ -23,7 +23,12 @@ struct login_arg{
   int sock_listen;
   struct sockaddr_in from_adrs;
   pthread_t tid;
-}l;
+};
+
+typedef struct _chat_arg {
+  WINDOW *win_main;
+  WINDOW *win_sub;
+}chat_arg;
 
 /* プライベート変数 */
 static int N_client;         /* クライアントの数 */
@@ -32,6 +37,7 @@ static client_info* last_client = NULL;
 static int Max_sd;               /* ディスクリプタ最大値 */
 static char Buf[BUFLEN];     /* 通信用バッファ */
 static message_info *message = NULL;
+static chat_arg* cht_arg;
 
 /* プライベート関数 */
 static void send_message();
@@ -106,7 +112,7 @@ void * client_login(void *arg)
   chop_nl(client->name);
 
   /* クライアントの名前を表示 */
-  printf("%s is accepted.\n", client->name);
+  //printf("%s is accepted.\n", client->name);
   /* クライアントリストへの追加　*/
   if(Client == NULL){
     Client = client;
@@ -128,12 +134,12 @@ void * client_login(void *arg)
 }
 
 void action_timeout(int signo){
-  printf("Time out!\n");
+  //printf("Time out!\n");
   return;
 }
 
 void * chat_loop(void *arg){
-
+  cht_arg = (chat_arg *)arg;
 #ifdef DEBUG
   printf("Chat loop start.\n");
 #endif
@@ -148,7 +154,7 @@ void * chat_loop(void *arg){
 }
 
 static void action_add_client(int signo){
-  printf("New Client.\n");
+  //printf("New Client.\n");
   return;
 }
 
@@ -297,7 +303,7 @@ static void delete_member(int client_sock)
         prev->next = client->next;
       }
       close(client->sock);
-      printf("Client[%s] disconnected.\n", client->name);
+      //printf("Client[%s] disconnected.\n", client->name);
       free(client);
       break;
     }
@@ -316,6 +322,7 @@ static void send_message()
   printf("Send Message Start.\n");
   printf("Message:%s\n", message->message);
 #endif
+  show_message_main(&cht_arg->win_main, (message->message)+5);
   while(message != NULL){
     len=strlen(message->message);
     /* メッセージを送信する */
@@ -341,6 +348,28 @@ static void send_message()
     prev_message = message;
     message = message->next;
     free(prev_message);
+  }
+}
+
+/* サーバーからクライアントへのメッセージの送信 */
+void send_message_from_server(char* msg)
+{
+  int len;
+  len = strlen(msg);
+  client_info *client = NULL;
+  client = Client;
+  while(client != NULL){
+    if(send(client->sock, msg, len, MSG_NOSIGNAL)==-1){
+      if(errno == EPIPE){
+        client_info *_delete = client;
+        client = client->next;
+        delete_member(_delete->sock);
+        continue;
+      }else{
+        exit_errmesg("send()");
+      }
+    };
+    client = client->next;
   }
 }
 
