@@ -8,12 +8,26 @@
 #include <curses.h>
 #include <ncurses.h>
 #include <locale.h>
+#include <pthread.h>
+#include <signal.h>
+#include <errno.h>
+#include <stdlib.h>
 
 #define BUFSIZE 1024 /* バッファサイズ */
 #define DEFAULT_PORT 50001       /* ポート番号 */
+#define NAME_LENGTH 15 /* ユーザ名の長さ */
+#define MAX_CLIENTS 100000 /* クライアント数の最大値 */ 
 
 /* サーバメインルーチン */
-void server_main(int port_number, int n_client);
+void server_main(char *user_name, in_port_t port);
+
+/* クライアントのログイン処理 */
+void * client_login(void *arg);
+
+void action_timeout(int signo);
+
+/* チャットサービスのメインループ */
+void * chat_loop();
 
 /* クライアントメインルーチン */
 void client_main(struct sockaddr_in server_adrs, char *user_name, in_port_t port);

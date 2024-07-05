@@ -3,6 +3,7 @@
 #define S_BUFSIZE 100   /* 送信用バッファサイズ */
 #define R_BUFSIZE 100   /* 受信用バッファサイズ */
 #define NAMELENGTH 100 /* ログイン名の長さ */
+//#define DEBUG
 
 void client_main(struct sockaddr_in server_adrs, char *user_name, in_port_t port)
 {
@@ -64,20 +65,24 @@ void client_main(struct sockaddr_in server_adrs, char *user_name, in_port_t port
     if( FD_ISSET(sock, &readfds) ){
       /* サーバから文字列を受信する */
       strsize = Recv(sock, r_buf, R_BUFSIZE-1, 0);
-      r_buf[strsize] = '\0';
-      char *header = strtok(r_buf, " ");
-      if(strcmp(header, "MESG") != 0){
-        continue;
-      }
-      //ここを抜粋して答える
-      //FINパケットを受け取った時，文字長は0になる
       if(strsize == 0){
         /* サーバが切断したとき */
-        printf("Connection closed.\n");
+        close(sock);
+        endwin();
+        
+        printf("Server is down.\n");
+        exit(EXIT_SUCCESS);
         break;
       }
-      header = strtok(NULL, "\0");
-      show_message_main(&win_main, header);
+      r_buf[strsize] = '\0';
+      chop_nl(r_buf);
+#ifdef DEBUG
+      show_message_main(&win_main, r_buf);
+#endif
+      if(strncmp(r_buf, "MESG",4) != 0){
+        continue;
+      }
+      show_message_main(&win_main, r_buf+5);
     }
 
   }

@@ -2,6 +2,7 @@
 
 #define RETRY 3 /* 再試行回数 */
 #define TIMEOUT_SEC 5 /* タイムアウト秒 */
+#define INIT_PORT 60000 /* ポート番号 */
 
 int main(int argc, char *argv[])
 {
@@ -37,11 +38,9 @@ int main(int argc, char *argv[])
   FD_ZERO(&mask);
   FD_SET(sock, &mask);
 
-  Sendto(sock, helo, strlen(helo), 0, (struct sockaddr *)&server_adrs, sizeof(server_adrs));
-
   /* サーバから文字列を受信 */
   for(int i=0;i<RETRY;i++){
-
+    Sendto(sock, helo, strlen(helo), 0, (struct sockaddr *)&server_adrs, sizeof(server_adrs));
     /* 受信データの有無をチェック */
     readfds = mask;
     timeout.tv_sec = TIMEOUT_SEC;
@@ -60,6 +59,7 @@ int main(int argc, char *argv[])
       printf("Start as Cliant!\n");
       //クライアントのメインループ
       client_main(from_adrs, argv[1], port);
+      pthread_exit(EXIT_SUCCESS);
     }else{
         printf("Received: %s\n", r_buf);
         printf("Incorrect format response receive!\n");
@@ -67,10 +67,8 @@ int main(int argc, char *argv[])
   }
 
   close(sock);
-  printf("Can't find server! This program is going to finish.\n");
-  //printf("Start as Server!\n");
+  printf("Start as Server!\n");
   //サーバーのメインループ
-  //server_main(port);
-
-  exit(EXIT_SUCCESS);
+  server_main(argv[1],port);
+  pthread_exit(EXIT_SUCCESS);
 }
