@@ -1,4 +1,6 @@
 #include "idobata.h"
+
+#define MESGLENGTH 488 /* メッセージの長さ制限 */
 //#define DEBUG
 
 typedef struct _login_arg {
@@ -89,6 +91,9 @@ void server_main(char *user_name, in_port_t port)
         close(udp_sock);
         close(tcp_sock_listen);
         break;
+      }else if(strsize > MESGLENGTH){
+        show_message_main(&cht_arg->win_main, "Message length is too long!");
+        continue;
       }
       char msg[BUFSIZE];
       strsize = snprintf(msg, BUFSIZE, "MESG [%s] %s", user_name, s_buf);

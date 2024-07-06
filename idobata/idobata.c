@@ -27,6 +27,10 @@ int main(int argc, char *argv[])
   if(argc == 3){
     port = (in_port_t)atoi(argv[2]);
   }
+  if(strlen(argv[1])>15){
+    fprintf(stderr, "user_anme too long! 15 or less");
+    exit(1);
+  }
   /* ブロードキャストアドレスを設定 */
   set_sockaddr_in_broadcast(&server_adrs, port);
 

@@ -1,6 +1,7 @@
 #include "idobata.h"
 
-#define NAMELENGTH 20 /* ログイン名の長さ制限 */
+#define NAMELENGTH 15 /* ログイン名の長さ制限 */
+#define MESGLENGTH 488 /* メッセージの長さ制限 */
 #define BUFLEN 500    /* 通信バッファサイズ */
 #define SUBWIN_LINES 2 /* サブウィンドウの行数 */
 #define TIMEOUT_SEC 5 /* タイムアウト秒 */
@@ -105,10 +106,24 @@ void * client_login(void *arg)
   client->sock = sock_accepted;
 
   /* クライアントの名前を受信 */
+  /* タイムアウトの時間を設定 */
+  alarm(TIMEOUT_SEC);
   strsize = Recv(sock_accepted, buf, NAME_LENGTH+5, 0);
   buf[strsize] = '\0';
-  if(strncmp(buf, join, 4) != 0){
+  if(strsize == -1){
+    if(errno == EINTR){
+      printf("Time out!\n");
+      close(sock_accepted);
+      exit(EXIT_FAILURE);
+    }else
+    exit_errmesg("Recv()");
+  }
+  else if(strncmp(buf, join, 4) != 0){
     exit(EXIT_FAILURE);
+  }
+  alarm(0); /* alarmをリセット */
+  if(strsize > NAME_LENGTH + 5){
+    exit_errmesg("Too long user name!");
   }
   strcpy(client->name, buf+5);
   chop_nl(client->name);
@@ -248,6 +263,12 @@ static int receive_message()
         client_info *_delete = client;
         client = client->next;
         delete_member(_delete->sock);
+        continue;
+      }else if(strsize > MESGLENGTH + 5){
+#ifdef DEBUG
+  printf("Too long message!",buf);
+#endif
+        client = client->next;
         continue;
       }
       buf[strsize] = '\0';
