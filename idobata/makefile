@@ -2,7 +2,7 @@
 # Makefile for tcp_echo
 #
 MYLIBDIR=../mynet
-MYLIB=-lmynet -lncurses -lcurses
+MYLIB=-lmynet -lncurses -lcurses -lpthread
 CFLAGS=-I${MYLIBDIR} -L${MYLIBDIR}
 OBJS=idobata.o idobata_server.o idobata_client.o common.o idobata_util.o
 

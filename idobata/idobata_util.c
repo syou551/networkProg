@@ -13,18 +13,21 @@ typedef struct _client_info{
   struct _client_info *next;
 }client_info;
 
+/* メッセージ情報を格納する構造体の定義 */
 typedef struct _message_info{
   int sender_sock;
   char message[BUFLEN];
   struct _message_info *next;
 }message_info;
 
+/* ログインスレッドの引数 */
 struct login_arg{
   int sock_listen;
   struct sockaddr_in from_adrs;
   pthread_t tid;
 };
 
+/* チャットスレッドの引数 */
 typedef struct _chat_arg {
   WINDOW *win_main;
   WINDOW *win_sub;
@@ -50,6 +53,7 @@ static void add_message_list(client_info *client, char *_mess, message_info **pr
 
 char *chop_nl(char *s);
 
+/* ログインスレッド本体 */
 void * client_login(void *arg)
 {
   int sock_listen;
@@ -94,7 +98,6 @@ void * client_login(void *arg)
     }else
     exit_errmesg("Accept()");
   }else if(client_adrs.sin_addr.s_addr != from_adrs.sin_addr.s_addr){
-    Send(sock_accepted, "Reject", 6, 0);
     close(sock_accepted);
     exit(EXIT_FAILURE);
   }
@@ -105,14 +108,11 @@ void * client_login(void *arg)
   strsize = Recv(sock_accepted, buf, NAME_LENGTH+5, 0);
   buf[strsize] = '\0';
   if(strncmp(buf, join, 4) != 0){
-    Send(sock_accepted, "Reject", 6, 0);
     exit(EXIT_FAILURE);
   }
   strcpy(client->name, buf+5);
   chop_nl(client->name);
 
-  /* クライアントの名前を表示 */
-  //printf("%s is accepted.\n", client->name);
   /* クライアントリストへの追加　*/
   if(Client == NULL){
     Client = client;
@@ -124,6 +124,7 @@ void * client_login(void *arg)
     last_client->next = NULL;
   }
 #ifdef DEBUG
+  /* クライアントの名前を表示 */
   printf("Client[%s] sock:[%d].\n", last_client->name,last_client->sock);
 #endif
   pthread_kill(login_arg->tid, SIGUSR1);
@@ -133,11 +134,12 @@ void * client_login(void *arg)
   return(NULL);
 }
 
+/* Acceptタイムアウト時に呼ばれるAction */
 void action_timeout(int signo){
-  //printf("Time out!\n");
   return;
 }
 
+/* チャットスレッド本体 */
 void * chat_loop(void *arg){
   cht_arg = (chat_arg *)arg;
 #ifdef DEBUG
@@ -153,11 +155,13 @@ void * chat_loop(void *arg){
   }
 }
 
+/* Client追加時に送られるSignalのAction */
 static void action_add_client(int signo){
   //printf("New Client.\n");
   return;
 }
 
+/* クライアントの追加Event通知の設定 */
 static void set_action_cleint(){
 #ifdef DEBUG
   printf("Set Event.\n");
@@ -173,6 +177,7 @@ static void set_action_cleint(){
   }
 }
 
+/* クライアントの追加Event通知の解除 */
 static void clr_action_client(){
 #ifdef DEBUG
   printf("Clear Event.\n");
@@ -215,6 +220,7 @@ static int receive_message()
 #ifdef DEBUG
   printf("select() intterupt.\n");
 #endif
+    /* クライアント追加Eventによる割り込み */
     if(errno == EINTR){
       /* 通知Event解除 */
       clr_action_client();
@@ -272,6 +278,7 @@ static int receive_message()
   else return -1;
 }
 
+/* メッセージリストへの追加 */
 static void add_message_list(client_info *client, char *_mess, message_info **prev_message)
 {
   message_info *_message = malloc(sizeof(message_info));
@@ -409,6 +416,7 @@ int input_message_sub(WINDOW **win_sub, char *buf, int S_BUFSIZE)
   return strlen(buf);
 }
 
+/* UDPクライアントの初期化(broadcast想定) */
 int init_udpclient_broadcast(int broadcast_sw)
 {
   int sock;
@@ -424,6 +432,7 @@ int init_udpclient_broadcast(int broadcast_sw)
   return(sock);
 }
 
+/* ブロードキャストアドレス情報をsockaddr_in構造体に格納する */
 void set_sockaddr_in_broadcast(struct sockaddr_in *server_adrs, 
 		               in_port_t port_number )
 {
@@ -434,6 +443,7 @@ void set_sockaddr_in_broadcast(struct sockaddr_in *server_adrs,
   server_adrs->sin_addr.s_addr = htonl(INADDR_BROADCAST);
 }
 
+/* クライアントの初期化（IP直接設定） */
 int init_tcpclient_ip(struct sockaddr_in server_adrs, in_port_t serverport)
 {
   struct hostent *server_host;

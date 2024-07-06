@@ -66,9 +66,14 @@ void server_main(char *user_name, in_port_t port)
 
     if( FD_ISSET(udp_sock, &readfds) ){
       strsize = Recvfrom(udp_sock, r_buf, BUFSIZE-1, 0,(struct sockaddr *)&from_adrs,&from_len);
+      if(strsize == -1){
+        exit_errmesg("recvfrom()");
+      }
       r_buf[strsize] = '\0';
       if( strncmp(r_buf, helo, 4) == 0 ){
-        sendto(udp_sock, here, strlen(here), 0, (struct sockaddr *)&from_adrs,sizeof(from_adrs));
+        if(sendto(udp_sock, here, strlen(here), 0, (struct sockaddr *)&from_adrs,sizeof(from_adrs))==-1){
+          exit_errmesg("sendto()");
+        };
         arg->from_adrs = from_adrs;
         /* スレッドを生成する */
         if( pthread_create(&tid, NULL, client_login, (void *)arg) != 0 ){
@@ -95,5 +100,7 @@ void server_main(char *user_name, in_port_t port)
       wrefresh(win_main);
     }
   }
-
+  
+  endwin();
+  pthread_exit(EXIT_SUCCESS);
 }

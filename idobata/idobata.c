@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
   in_port_t port = DEFAULT_PORT;
   char helo[] = "HELO";
   char here[] = "HERE";
-  char s_buf[1024], r_buf[BUFSIZE];
+  char s_buf[BUFSIZE], r_buf[BUFSIZE];
   int strsize;
   fd_set mask, readfds;
   struct timeval timeout;
