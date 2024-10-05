@@ -1,3 +1,15 @@
+/*
+工夫した点，苦労した点は各ソースコードの冒頭にそれぞれ記述
+ここにはまとめて全体で工夫したこと，苦労したことを記述
+・工夫した点
+	- 他のクライアントの接続待ちなどの時にサーバーからメッセージを送信し，状態を確認できるようにした
+	- サーバーがダウンした時，クライアントはメッセージを表示して終了するようにした
+	- クライアントが全員接続を切断した場合，サーバーが自動的に終了するようにした
+	- クライアントでメッセージの入力，受信したメッセージが誰からのものか，自分のメッセージがどれかというのが
+	  一目でわかるようにCursesによる画面制御を実装した
+・苦労した点
+	- cursesによる画面制御を実装する際，画面の初期化やメッセージの表示，入力などの処理が複雑であった点
+*/
 #include "chat.h"
 #include "mynet.h"
 #include <stdlib.h>
@@ -11,6 +23,8 @@
 extern char *optarg;
 extern int optind, opterr, optopt;
 
+//main関数
+//コマンド引数よりサーバーモードかクライアントモードかを判断し，それぞれの関数を呼び出す
 int main(int argc, char *argv[])
 {
   int port_number=DEFAULT_PORT;
@@ -59,7 +73,7 @@ int main(int argc, char *argv[])
   switch(mode){
 
   case 'S':
-    chat_server(port_number, num_client);  /* サーバ部分ができたらコメントを外す */
+    chat_server(port_number, num_client);
     break;
   case 'C':
     chat_client(servername, port_number);

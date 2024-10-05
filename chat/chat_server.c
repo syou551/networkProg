@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+// サーバのメイン関数
 void chat_server(int port_number, int n_client)
 {
   int sock_listen;

@@ -15,5 +15,18 @@
 
 int init_tcpserver(in_port_t myport, int backlog);
 int init_tcpclient(char *servername, in_port_t serverport);
+int init_tcpclient_ip(struct sockaddr_in server_adrs, in_port_t serverport);
 void exit_errmesg(char *errmesg);
+//udp
+int init_udpserver(in_port_t myport);
+int init_udpclient();
+int init_udpclient_broadcast(int broadcast_sw);
+void set_sockaddr_in(struct sockaddr_in *server_adrs, 
+		     char *servername, in_port_t port_number );
+int Sendto( int sock, const void *s_buf, size_t strsize, int flags, 
+	    const struct sockaddr *to, socklen_t tolen);
+int Recvfrom(int sock, void *r_buf, size_t len, int flags,
+	     struct sockaddr *from, socklen_t *fromlen);
+void set_sockaddr_in_broadcast(struct sockaddr_in *server_adrs, 
+		in_port_t port_number );
 #endif  /* MYNET_H_ */
